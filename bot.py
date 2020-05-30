@@ -4,6 +4,8 @@
 import telebot
 import config
 
+types = telebot.types
+
 bot = telebot.TeleBot(config.token)
 
 keyboard1 = telebot.types.ReplyKeyboardMarkup(True)
