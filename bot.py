@@ -1,10 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import parser
 
 import telebot
 import config
 
+
 from telebot import types
+
+from Task import Task
 
 bot = telebot.TeleBot(config.token)
 
@@ -26,6 +30,20 @@ def send_text(message):
         bot.send_message(message.chat.id, 'Прощай, создатель')
     if message.text == 'Love':
         bot.send_sticker(message.chat.id, 'CAADAgADUAkAAnlc4gn1AAE2sQABMfNIAg')
+    if message.text == '1':
+        msg = bot.send_message(message.chat.id, 'Сколько вам лет?')
+        bot.register_next_step_handler(msg, askAge)
+
+
+def askAge(message):
+    chat_id = message.chat.id
+    text = message.text
+    if not text.isdigit():
+        msg = bot.send_message(chat_id, 'Возраст должен быть числом, введите ещё раз.')
+        bot.register_next_step_handler(msg, askAge) #askSource
+        return
+    msg = bot.send_message(chat_id, 'Спасибо, я запомнил что вам ' + text + ' лет.')
+
 
 
 bot.polling()
