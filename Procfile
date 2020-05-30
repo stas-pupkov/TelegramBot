@@ -1,1 +1,1 @@
-bot: sh -c 'cd ./first' && python3 bot.py
+bot: python3 /first/bot.py
