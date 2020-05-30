@@ -1,1 +1,1 @@
-bot: python3 /webhooks bot.py
+bot: python3 /webhooks/bot.py
