@@ -8,7 +8,7 @@ from telebot import types
 
 bot = telebot.TeleBot(config.token)
 
-keyboard1 = types(True)
+keyboard1 = types.ReplyKeyboardMarkup(True)
 keyboard1.row('Привет', 'Пока')
 keyboard1.row('/start')
 
