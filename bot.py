@@ -6,7 +6,6 @@ import config
 
 bot = telebot.TeleBot(config.token)
 
-keyboard1 = telebot.types.ReplyKeyboardMarkup()
 keyboard1 = telebot.types.ReplyKeyboardMarkup(True)
 keyboard1.row('Привет', 'Пока')
 keyboard1.row('/start')
