@@ -1,10 +1,9 @@
 import telebot
-import bs4
 
 import config
-from Task import Task
+from parser_habr.Task import Task
 import parser
-import markups as m
+from parser_habr import markups as m
 
 bot = telebot.TeleBot(config.token)
 task = Task()

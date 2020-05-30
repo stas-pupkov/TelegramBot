@@ -1,14 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import parser
 
 import telebot
 import config
 
 
 from telebot import types
-
-from Task import Task
 
 bot = telebot.TeleBot(config.token)
 
