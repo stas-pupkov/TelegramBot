@@ -5,9 +5,19 @@ import logging
 
 import config
 
+from telebot import types
+
 bot = telebot.TeleBot(config.token)
 
-# Здесь пишем наши хэндлеры
+keyboard1 = types.ReplyKeyboardMarkup(True)
+keyboard1.row('Привет', 'Пока')
+keyboard1.row('/start')
+
+
+@bot.message_handler(commands=['start'])
+def start_message(message):
+    bot.send_message(message.chat.id, 'Привет, ты написал мне /start', reply_markup=keyboard1)
+
 
 # Проверим, есть ли переменная окружения Хероку (как ее добавить смотрите ниже)
 if "HEROKU" in list(os.environ.keys()):
