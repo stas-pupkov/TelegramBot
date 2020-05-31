@@ -3,6 +3,7 @@
 
 import telebot
 import config
+import os
 
 
 from telebot import types
@@ -17,6 +18,14 @@ keyboard1.row('/start')
 @bot.message_handler(commands=['start'])
 def start_message(message):
     bot.send_message(message.chat.id, 'Привет, ты написал мне /start', reply_markup=keyboard1)
+
+    #работа с файлами из других директорий
+    fileDir = os.path.dirname(os.path.realpath('__file__'))
+    filename = os.path.join(fileDir, '../stickers/sticker.webp')
+    filename = os.path.abspath(os.path.realpath(filename))
+    sti = open(filename, 'rb')
+    bot.send_sticker(message.chat.id, sti)
+
 
 
 @bot.message_handler(content_types=['text'])
