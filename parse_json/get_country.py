@@ -17,61 +17,64 @@ keyboard1 = types.ReplyKeyboardMarkup(True)
 keyboard1.row('Привет', 'Пока')
 keyboard1.row('/start')
 
+keyboard = types.InlineKeyboardMarkup(row_width=4)
+button1 = types.InlineKeyboardButton(text="Eu Can't", callback_data="EuNo")
+button2 = types.InlineKeyboardButton(text="Eu Can", callback_data="EuYes")
+button3 = types.InlineKeyboardButton(text="Nor Can't", callback_data="NorNo")
+button4 = types.InlineKeyboardButton(text="Nor Can", callback_data="NorYes")
+button5 = types.InlineKeyboardButton(text="Sou Can't", callback_data="SouNo")
+button6 = types.InlineKeyboardButton(text="As Can't", callback_data="AsNo")
+button7 = types.InlineKeyboardButton(text="As Can", callback_data="AsYes")
+button8 = types.InlineKeyboardButton(text="Af Can't", callback_data="AfNo")
+button9 = types.InlineKeyboardButton(text="Af Can", callback_data="AfYes")
+button10 = types.InlineKeyboardButton(text="Pac Can't", callback_data="PacNo")
+button11 = types.InlineKeyboardButton(text="Car Can't", callback_data="CarNo")
+button12 = types.InlineKeyboardButton(text="Car Can", callback_data="CarYes")
+keyboard.add(button1,
+             button2,
+             button3,
+             button4,
+             button5,
+             button6,
+             button7,
+             button8,
+             button9,
+             button10,
+             button11,
+             button12)
 
-@bot.message_handler(commands=['start'])
-def start_message(message):
-    url = 'https://www.iatatravelcentre.com/international-travel-document-news/1580226297.htm'
-    r = requests.get(url).text
-    a = r.find('RU: ')
-    b = r[a: a + 5000]
-    c = b[: b.find(',\n gdpAdjusted:') - 1]
-    print(c)
-    param = c.replace('&#32;', ' ').replace('<br/>', '\n').replace('{\ngdp: \'', '\n')
-    print(param)
-    bot.send_message(message.chat.id, param, reply_markup=keyboard1)
+url = 'https://www.wanderlust.co.uk/content/coronavirus-travel-updates/'
+long_body = 7000
 
-
-# @bot.message_handler(content_types=['text'])
-# def send_text(message):
-#     if message.text.lower() == 'привет':
-#         mess_sender = get_country()
-#         bot.send_message(message.chat.id, mess_sender)
-#     else:
-#         bot.send_message(message.chat.id, 'Привет, мой создатель')
-
-
-def get_country():
-    html = urllib.request.urlopen('https://www.wanderlust.co.uk/content/coronavirus-travel-updates/').read()
-    soup = BeautifulSoup(html, 'html.parser')
-    head = soup.find_all('li')
-    #line = head.find_next(attrs={'data-test': 'currency-table-row'})
-    #value = line.contents[7]
-    print(head)
-    output = ''
-    for i in head:
-        i = i.get_text()
-        output += ('- "'+i+'",\n')
-    return output
-
+questions = [
+        'Which European countries have travel restrictions?',
+        'Which European countries you can still travel to?',
+        'Which North American places have travel restrictions?',
+        'Which North American countries have their borders open?',
+        'Which Central and South America Countries have travel restrictions?',
+        'Which Asian countries have travel restrictions?',
+        'Which Asian countries have their borders open?',
+        'Which African countries have travel restrictions?',
+        'Which African countries still have their borders open?',
+        'Which South Pacific countries can you not travel to?',
+        'Which Caribbean countries have travel restrictions?',
+        'Which Caribbean countries still have their borders open?'
+    ]
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
+    if message.text.lower() == '1':
+        mess_sender = cant_travel_country_europe()
+        bot.send_message(message.chat.id, mess_sender)
     if message.text.lower() == 'привет':
-        mess_sender = get_can_travel_country()
-        bot.send_message(message.chat.id, mess_sender)
-    if message.text.lower() == 'пока':
-        mess_sender = get_cant_travel_country()
-        bot.send_message(message.chat.id, mess_sender)
+        bot.send_message(message.chat.id, "Country", reply_markup=keyboard)
 
 
-
-def get_cant_travel_country():
-    url = 'https://www.wanderlust.co.uk/content/coronavirus-travel-updates/'
+def get_list_countries(question1, question2):
     body = requests.get(url).text
-    begin = body.find('Which European countries have travel restrictions?')
-    b = body[begin: begin + 6000]
-    need_part = b[: b.find('Which European countries you can still travel to?') - 1]
-
+    begin = body.find(question1)
+    b = body[begin: begin + long_body]
+    need_part = b[: b.find(question2)]
     need_part = need_part.replace('<li>', '') \
         .replace('<span>', '') \
         .replace('</span>', '') \
@@ -96,35 +99,85 @@ def get_cant_travel_country():
     return output
 
 
-def get_can_travel_country():
-    url = 'https://www.wanderlust.co.uk/content/coronavirus-travel-updates/'
-    body = requests.get(url).text
-    begin = body.find('Which European countries you can still travel to?')
-    b = body[begin: begin + 6000]
-    need_part = b[: b.find('<h2 style="text-align: center;"><a name="usa"></a>North America</h2>') - 1]
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    if call.message:
+        if call.data == "EuNo":
+            bot.send_message(call.message.chat.id, cant_travel_country_europe())
+        if call.data == "EuYes":
+            bot.send_message(call.message.chat.id, can_travel_country_europe())
+        if call.data == "NorNo":
+            bot.send_message(call.message.chat.id, cant_travel_country_north())
+        if call.data == "NorYes":
+            bot.send_message(call.message.chat.id, can_travel_country_north())
+        if call.data == "SouNo":
+            bot.send_message(call.message.chat.id, cant_travel_country_south())
+        if call.data == "AsNo":
+            bot.send_message(call.message.chat.id, cant_travel_country_asia())
+        if call.data == "AsYes":
+            bot.send_message(call.message.chat.id, can_travel_country_asia())
+        if call.data == "AfNo":
+            bot.send_message(call.message.chat.id, cant_travel_country_africa())
+        if call.data == "AfYes":
+            bot.send_message(call.message.chat.id, can_travel_country_africa())
+        if call.data == "PacNo":
+            bot.send_message(call.message.chat.id, cant_travel_country_pacific())
+        if call.data == "CarNo":
+            bot.send_message(call.message.chat.id, cant_travel_country_caribbean())
+        if call.data == "CarYes":
+            bot.send_message(call.message.chat.id, can_travel_country_caribbean())
 
-    need_part = need_part.replace('<li>', '')\
-        .replace('<span>', '')\
-        .replace('</span>', '')\
-        .replace('<br />', '')\
-        .replace('<br /><br />', '')\
-        .replace('</li>', '') \
-        .replace('<p>', '') \
-        .replace('</p>', '') \
-        .replace('<ul>', '')\
-        .replace('<li style="text-align: left;">', '\n')\
-        .replace('</h3>', '')
-    need_part = need_part.replace(': ', '')
-    need_part = need_part.replace(':', '')
-    param = need_part.replace('<strong></strong>', '')
-    countries_list = param.split('<strong>')
-    del countries_list[0]
 
-    output = ''
-    for i in countries_list:
-        i = i[0: i.find('</strong>')]
-        output += ('- ' + i + '\n')
-    return output
+
+
+def cant_travel_country_europe():
+    return get_list_countries(questions[0], questions[1])
+
+
+def can_travel_country_europe():
+    return get_list_countries(questions[1], questions[2])
+
+
+def cant_travel_country_north():
+    return get_list_countries(questions[2], questions[3])
+
+
+def can_travel_country_north():
+    return get_list_countries(questions[3], questions[4])
+
+
+def cant_travel_country_south():
+    return get_list_countries(questions[4], questions[5])
+
+
+def cant_travel_country_asia():
+    return get_list_countries(questions[5], questions[6])
+
+
+def can_travel_country_asia():
+    return get_list_countries(questions[6], questions[7])
+
+
+def cant_travel_country_africa():
+    return get_list_countries(questions[7], questions[8])
+
+
+def can_travel_country_africa():
+    return get_list_countries(questions[8], questions[9])
+
+
+def cant_travel_country_pacific():
+    return get_list_countries(questions[9], questions[10])
+
+
+def cant_travel_country_caribbean():
+    return get_list_countries(questions[10], questions[11])
+
+
+def can_travel_country_caribbean():
+    return get_list_countries(questions[11], questions[12])
+
+
 
 
 bot.polling()
