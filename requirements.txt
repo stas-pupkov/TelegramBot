@@ -1,3 +1,5 @@
+beautifulsoup4
+requests
 telebot
 flask
 pyTelegramBotAPI==3.7.1
