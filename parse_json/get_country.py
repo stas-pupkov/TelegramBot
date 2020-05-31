@@ -15,6 +15,10 @@ keyboard1 = types.ReplyKeyboardMarkup(True)
 keyboard1.row('Привет', 'Пока')
 keyboard1.row('/start')
 
+url = 'https://www.wanderlust.co.uk/content/coronavirus-travel-updates/'
+body = requests.get(url).text
+long_body = 7000
+
 keyboard = types.InlineKeyboardMarkup(row_width=4)
 button1 = types.InlineKeyboardButton(text="Eu Can't", callback_data="EuNo")
 button2 = types.InlineKeyboardButton(text="Eu Can", callback_data="EuYes")
@@ -28,6 +32,7 @@ button9 = types.InlineKeyboardButton(text="Af Can", callback_data="AfYes")
 button10 = types.InlineKeyboardButton(text="Pac Can't", callback_data="PacNo")
 button11 = types.InlineKeyboardButton(text="Car Can't", callback_data="CarNo")
 button12 = types.InlineKeyboardButton(text="Car Can", callback_data="CarYes")
+url_button = types.InlineKeyboardButton(text="Resource website", url=url)
 keyboard.add(button1,
              button2,
              button3,
@@ -40,10 +45,7 @@ keyboard.add(button1,
              button10,
              button11,
              button12)
-
-url = 'https://www.wanderlust.co.uk/content/coronavirus-travel-updates/'
-body = requests.get(url).text
-long_body = 7000
+keyboard.row(url_button)
 
 questions = [
         'Which European countries have travel restrictions?',
@@ -67,7 +69,10 @@ def send_text(message):
         mess_sender = cant_travel_country_europe()
         bot.send_message(message.chat.id, mess_sender)
     if message.text.lower() == 'привет':
-        bot.send_message(message.chat.id, "Country", reply_markup=keyboard)
+        keyboard2 = types.InlineKeyboardMarkup(row_width=1)
+
+        keyboard2.add(url_button)
+        bot.send_message(message.chat.id, 'Country', reply_markup=keyboard)
 
 
 def get_list_countries(question1, question2):
