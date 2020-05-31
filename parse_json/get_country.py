@@ -1,10 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import urllib
 
 import requests
 import telebot
-from bs4 import BeautifulSoup
 
 import config
 
@@ -44,6 +42,7 @@ keyboard.add(button1,
              button12)
 
 url = 'https://www.wanderlust.co.uk/content/coronavirus-travel-updates/'
+body = requests.get(url).text
 long_body = 7000
 
 questions = [
@@ -55,10 +54,11 @@ questions = [
         'Which Asian countries have travel restrictions?',
         'Which Asian countries have their borders open?',
         'Which African countries have travel restrictions?',
-        'Which African countries still have their borders open?',
+        'Which African countries still have their borders open?',
         'Which South Pacific countries can you not travel to?',
         'Which Caribbean countries have travel restrictions?',
-        'Which Caribbean countries still have their borders open?'
+        'Which Caribbean countries still have their borders open?',
+        'Can\'t wait to travel again?'
     ]
 
 @bot.message_handler(content_types=['text'])
@@ -71,7 +71,6 @@ def send_text(message):
 
 
 def get_list_countries(question1, question2):
-    body = requests.get(url).text
     begin = body.find(question1)
     b = body[begin: begin + long_body]
     need_part = b[: b.find(question2)]
@@ -95,7 +94,8 @@ def get_list_countries(question1, question2):
     output = ''
     for i in countries_list:
         i = i[0: i.find('</strong>')]
-        output += ('- ' + i + '\n')
+        if len(i) > 0 and i[0].isupper():
+            output += ('- ' + i + '\n')
     return output
 
 
@@ -180,4 +180,4 @@ def can_travel_country_caribbean():
 
 
 
-bot.polling()
+bot.polling(none_stop=True)
