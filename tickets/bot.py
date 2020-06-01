@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import json
+
 import requests
 import telebot
 from bs4 import BeautifulSoup
@@ -17,16 +19,37 @@ keyboard1.row('/start')
 
 
 
-url = 'https://www.google.com/search?sxsrf=ALeKk03RR756WLVS2xpoVDpulrupdvUItA%3A1590978628310&ei=RGjUXpSGEvSLk74PvtiE4AI&q=dollar&oq=dolla&gs_lcp=CgZwc3ktYWIQAxgDMgQIABBDMgQIABBDMgQIABBDMgIIADIECAAQQzIECAAQQzIFCAAQywEyBAgAEEMyBAgAEEMyBAgAEEM6BAgAEEc6BAgjECdQoPUBWIr-AWD1jwJoAHADeACAAcEBiAG-BpIBAzAuNZgBAKABAaoBB2d3cy13aXo&sclient=psy-ab'
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
+
+# headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36',
+#            'X-Access-Token': 'f14fe0ba8027435931a2f6aac4281692',
+#            'Accept-Encoding': 'gzip, deflate'}
 
 
 
-def get_currency_price():
-    full_page = requests.get(url, headers=headers)
-    soup = BeautifulSoup(full_page.content, 'html.parser')
-    convert = soup.findAll('span', {'class': 'DFlfde SwHCTb'})
-    return convert[0].text
+def get_fun():
+    url = "http://api.travelpayouts.com/v1/prices/cheap"
+
+    querystring = {"origin": "MOW", "destination": "HKT"}
+
+    headers = {'X-Access-Token': 'f14fe0ba8027435931a2f6aac4281692',
+               'Accept-Encoding': 'gzip'}
+
+    ur = 'http://map.aviasales.ru/prices.json?origin_iata=OVB&period=2020-06-01:season&direct=true&one_way=false&no_visa=true&schengen=true&need_visa=true&locale=ru&min_trip_duration_in_days=13&max_trip_duration_in_days=15'
+
+    response = requests.get(ur).json()
+    # response = requests.get(url, headers=headers, params=querystring).json()
+    #
+    # json_str = json.dumps(response)
+    # resp = json.loads(json_str)['data']['HKT']
+    #
+    # for (k, v) in resp.items():
+    #     print(k + ' ' + str(v))
+
+    for i in response:
+        print(i)
+
+    return str(response['data'])
+
 
 
 @bot.message_handler(commands=['start'])
@@ -38,7 +61,7 @@ def start_message(message):
 @bot.message_handler(content_types=["text"])
 def default_test(message):
     if message.text.lower() == 'привет':
-        bot.send_message(message.chat.id, "Price = " + get_currency_price())
+        bot.send_message(message.chat.id, get_fun())
 
 
 bot.polling(none_stop=True)
