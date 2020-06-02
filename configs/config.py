@@ -5,8 +5,11 @@ url_dollar_google = 'https://www.google.com/search?sxsrf=ALeKk03RR756WLVS2xpoVDp
 url_dollar_cb = 'https://www.cbr-xml-daily.ru/daily_json.js'
 url_border_countries = 'https://www.wanderlust.co.uk/content/coronavirus-travel-updates/'
 url_aviasales = 'http://map.aviasales.ru/prices.json'
-url_aviasales_search = 'https://www.aviasales.ru/search/'
-url_iata_info = 'https://www.air-port-codes.com/search/results/'
+#url_aviasales_search = 'https://www.aviasales.ru/search/'
+url_aviasales_search = 'https://www.aviasales.ru/map?'
+url_iata_info1 = 'https://www.air-port-codes.com/search/results/'
+url_iata_info = 'https://openflights.org/php/apsearch.php'
+
 
 headers_dollar_google = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
 long_body = 9000

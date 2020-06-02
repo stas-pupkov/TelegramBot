@@ -70,7 +70,6 @@ def callback_inline(call):
         permission = 'Страны с открытыми границами в '
     else:
         permission = 'Страны с закрытыми границами в '
-    print(call.data)
     if call.message:
         msg = permission + '"' + str(call.data)[4:] \
                          + '"' \

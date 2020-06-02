@@ -153,74 +153,96 @@ def get_tickets(from_city, date):
 
 
 def get_info_iata(iata):
-    url = config.url_iata_info + iata
-    full_page = requests.get(url)
-    soup = BeautifulSoup(full_page.content, 'html.parser')
-    table = soup.findAll('table', 'small')[0]
-    airport = table.select('a')[0].text
-    country = table.select('a')[3].text
+    url = config.url_iata_info
+    headers_iata = {'iata': iata,
+                    'country': 'ALL',
+                    'dst': 'U',
+                    'db': 'airports',
+                    'iatafilter': True,
+                    'action': 'SEARCH',
+                    'offset': 0}
+    response = requests.post(url, data=headers_iata).json()
+    print(response)
+    try:
+        airport = str(response['airports'][0]['name'])
+        country = str(response['airports'][0]['country'])
+    except BaseException:
+        url = config.url_iata_info1 + iata
+        full_page = requests.get(url)
+        soup = BeautifulSoup(full_page.content, 'html.parser')
+        table = soup.findAll('table', 'small')[0]
+        airport = table.select('a')[0].text
+        country = table.select('a')[3].text
     return airport, country
 
 
-def get_message_one_ticket(ticket, chat_id, from_city, airport, country, destination_iata):
-    price = ticket['value']
-    if len(str(price)) < 8:
-        depart_date = str(ticket['depart_date'])
-        return_date = str(ticket['return_date'])
-        transfer = str(ticket['number_of_changes'])
-        msg = ('- ' + airport + ', ' + country
-               + '\nЦена билета: ' + str(price) + ' рублей'
-               + '\nОтправление: ' + depart_date
-               + '\nВозвращение: ' + return_date
-               + '\nПересадок: ' + transfer)
+def get_message_one_ticket(ticket, chat_id, from_city, date, airport, country, destination_iata):
+    price = str(ticket['value'])
+    transfer = str(ticket['number_of_changes'])
+    msg = ('- ' + airport + ', ' + destination_iata + ', ' + country
+           + '\nЦена билета: ' + price + ' рублей'
+           + '\nПересадок: ' + transfer)
 
-        depart_day = depart_date[8:10]
-        depart_month = depart_date[5:7]
-        return_day = return_date[8:10]
-        return_month = return_date[5:7]
-        website = config.url_aviasales_search \
-                  + from_city \
-                  + depart_day \
-                  + depart_month \
-                  + destination_iata \
-                  + return_day \
-                  + return_month \
-                  + '1'
-        keyboard = types.InlineKeyboardMarkup()
-        url_button = types.InlineKeyboardButton(text='Посмотреть на Aviasales', url=website)
-        keyboard.add(url_button)
-        bot.send_message(chat_id, msg, reply_markup=keyboard)
+    website = config.url_aviasales_search \
+              + 'adults=1&children=0&infants=0&origin_iata=' \
+              + from_city \
+              + '&destination_iata=' \
+              + destination_iata \
+              + '&depart_date=' \
+              + str(date[5:7]) \
+              + '&return_date=min%3A1%2Cmax%3A30'
+
+    keyboard = types.InlineKeyboardMarkup()
+    url_button = types.InlineKeyboardButton(text='Посмотреть на Aviasales', url=website)
+    keyboard.add(url_button)
+    bot.send_message(chat_id, msg, reply_markup=keyboard)
+
 
 
 def get_info_tickets(chat_id, from_city, date):
     response = get_tickets(from_city, date)
-    for i in response:
-        print(i)
     if 'Error' in str(response):
         bot.send_message(chat_id, response)
     else:
         output, config.europe_permission = get_list_countries(config.questions_borders[1], config.questions_borders[2])
         output, config.asia_permission = get_list_countries(config.questions_borders[6], config.questions_borders[7])
         output, config.north_permission = get_list_countries(config.questions_borders[3], config.questions_borders[4])
-        counter_eurasia = 0
+        counter_europe = 0
+        counter_asia = 0
         counter_north = 0
         for ticket in response:
             ticket = json.loads(ticket)
             destination_iata = ticket['destination']
             airport, country = get_info_iata(destination_iata)
-
-            if country in str(config.europe_permission) or country in str(config.asia_permission):
+            if country == 'Russia':
+                continue
+            if country in str(config.europe_permission):
+                if counter_europe > 2:
+                    continue
                 get_message_one_ticket(ticket,
                                        chat_id,
                                        from_city,
+                                       date,
                                        airport,
                                        country,
                                        destination_iata)
-                counter_eurasia = counter_eurasia + 1
-                if counter_eurasia > 2:
-                    break
+                counter_europe = counter_europe + 1
 
-            if country in config.north_permission:
+            elif country in str(config.asia_permission):
+                if counter_asia > 2:
+                    continue
+                get_message_one_ticket(ticket,
+                                       chat_id,
+                                       from_city,
+                                       date,
+                                       airport,
+                                       country,
+                                       destination_iata)
+                counter_asia = counter_asia + 1
+
+            elif country in config.north_permission:
+                if counter_north > 2:
+                    continue
                 get_message_one_ticket(ticket,
                                        chat_id,
                                        from_city,
@@ -228,11 +250,11 @@ def get_info_tickets(chat_id, from_city, date):
                                        country,
                                        destination_iata)
                 counter_north = counter_north + 1
-                if counter_north > 2:
-                    break
 
-    if counter_eurasia == 0:
-        bot.send_message(chat_id, 'Билетов по Евразии нет')
+    if counter_europe == 0:
+        bot.send_message(chat_id, 'Билетов по Европе нет')
+    if counter_asia == 0:
+            bot.send_message(chat_id, 'Билетов по Азии нет')
     if counter_north == 0:
         bot.send_message(chat_id, 'Билетов по Северной Америке нет')
 
