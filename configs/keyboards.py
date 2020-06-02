@@ -10,6 +10,7 @@ main_keyboard.add(main_keyboard_btn1,
                   main_keyboard_btn2,
                   main_keyboard_btn3)
 
+
 part_world_keyboard = types.InlineKeyboardMarkup(row_width=2)
 #Открыты
 part_world_keyboard_btn1 = types.InlineKeyboardButton(text=config.parts_world[0], callback_data=config.parts_world[0])
@@ -39,3 +40,18 @@ part_world_keyboard.add(part_world_keyboard_btn1,
                         part_world_keyboard_btn11,
                         part_world_keyboard_btn12)
 part_world_keyboard.row(part_world_keyboard_url_button)
+
+
+
+
+from_city_keyboard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+from_city_keyboard_btn1 =  types.KeyboardButton('Новосибирск')
+from_city_keyboard_btn2 =  types.KeyboardButton('Москва')
+from_city_keyboard.add(from_city_keyboard_btn1,
+                       from_city_keyboard_btn2)
+
+data_keyboard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+data_keyboard_btn1 = types.KeyboardButton('Текущий')
+data_keyboard_btn2 = types.KeyboardButton('Следующий')
+data_keyboard.add(data_keyboard_btn1,
+                  data_keyboard_btn2)

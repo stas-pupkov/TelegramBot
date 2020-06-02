@@ -1,8 +1,12 @@
+import json
+from datetime import datetime
+
 import requests
 import telebot
 from bs4 import BeautifulSoup
+from telebot import types
 
-from configs import config
+from configs import config, keyboards
 
 bot = telebot.TeleBot(config.token)
 
@@ -114,40 +118,88 @@ def can_travel_country_caribbean():
     return get_list_countries(config.questions_borders[11], config.questions_borders[12])
 
 
-def select_fun_for_part_world(message):
-    part = ''
-    title = message.text
-    list_parts_world = config.parts_world
-    if list_parts_world[0] in title:
-        return can_travel_country_europe()
+def get_tickets(from_city, date):
+    querystring = {'origin_iata': from_city,
+                   'period': date + '01:month',
+                   'locale': 'ru'}
+    response = requests.get(config.url_aviasales, params=querystring).json()
+
+    output = []
+    for i in response:
+        output.append(str(i)
+                      .replace('\'', '\"')
+                      .replace('True', 'true')
+                      .replace('False', 'false'))
+    output = sorted(output)
+    if len(output) != 0:
+        return output
+    else:
+        return 'Error: неверный данные отправления'
+
+
+def get_info_iata(iata):
+    url = config.url_iata_info + iata
+    full_page = requests.get(url)
+    soup = BeautifulSoup(full_page.content, 'html.parser')
+    table = soup.findAll('table', 'small')[0]
+    airport = table.select('a')[0].text
+    country = table.select('a')[3].text
+    return airport, country
+
+
+def get_message_one_ticket(ticket, chat_id, from_city, airport, country, destination_iata):
+    price = ticket['value']
+    if len(str(price)) < 8:
+        depart_date = str(ticket['depart_date'])
+        return_date = str(ticket['return_date'])
+        transfer = str(ticket['number_of_changes'])
+        msg = ('- ' + airport + ', ' + country
+               + '\nЦена билета: ' + str(price) + ' рублей'
+               + '\nОтправление: ' + depart_date
+               + '\nВозвращение: ' + return_date
+               + '\nПересадок: ' + transfer)
+
+        depart_day = str(depart_date)[8:9]
+        depart_month = str(depart_date)[6:7]
+        return_day = str(depart_date)[8:9]
+        return_month = str(depart_date)[6:7]
+        website = config.url_aviasales_search \
+                  + from_city \
+                  + depart_day \
+                  + depart_month \
+                  + destination_iata \
+                  + return_day \
+                  + return_month \
+                  + '1'
+        keyboard = types.InlineKeyboardMarkup()
+        url_button = types.InlineKeyboardButton(text='Посмотреть на Aviasales', url=website)
+        keyboard.add(url_button)
+        bot.send_message(chat_id, msg, reply_markup=keyboard)
+
+
+def get_info_tickets(chat_id, from_city, date):
+    response = get_tickets(from_city, date)
+    if 'Error' in str(response):
+        bot.send_message(chat_id, response)
+    else:
+        for ticket in response:
+            ticket = json.loads(ticket)
+            destination_iata = ticket['destination']
+            airport, country = get_info_iata(destination_iata)
+            if country in config.europe:
+                counter = 0
+                bot.send_message(chat_id, 'В Европе')
+                get_message_one_ticket(ticket,
+                                       chat_id,
+                                       from_city,
+                                       airport,
+                                       country,
+                                       destination_iata)
+                counter = counter + 1
+                if counter > 2:
+                    break
 
 
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_inline(call):
-    if call.message:
-        if call.data == config.parts_world[0]:
-            bot.send_message(call.message.chat.id, cant_travel_country_europe())
-        if call.data == "EuYes":
-            bot.send_message(call.message.chat.id, can_travel_country_europe())
-        if call.data == "NorNo":
-            bot.send_message(call.message.chat.id, cant_travel_country_north())
-        if call.data == "NorYes":
-            bot.send_message(call.message.chat.id, can_travel_country_north())
-        if call.data == "SouNo":
-            bot.send_message(call.message.chat.id, cant_travel_country_south())
-        if call.data == "AsNo":
-            bot.send_message(call.message.chat.id, cant_travel_country_asia())
-        if call.data == "AsYes":
-            bot.send_message(call.message.chat.id, can_travel_country_asia())
-        if call.data == "AfNo":
-            bot.send_message(call.message.chat.id, cant_travel_country_africa())
-        if call.data == "AfYes":
-            bot.send_message(call.message.chat.id, can_travel_country_africa())
-        if call.data == "PacNo":
-            bot.send_message(call.message.chat.id, cant_travel_country_pacific())
-        if call.data == "CarNo":
-            bot.send_message(call.message.chat.id, cant_travel_country_caribbean())
-        if call.data == "CarYes":
-            bot.send_message(call.message.chat.id, can_travel_country_caribbean())
+    bot.send_message(chat_id, 'Поиск завершен')
