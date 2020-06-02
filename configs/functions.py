@@ -53,11 +53,14 @@ def get_list_countries(question1, question2):
     del countries_list[0]
 
     output = ''
+    array = []
     for i in countries_list:
         i = i[0: i.find('</strong>')]
         if len(i) > 0 and i[0].isupper():
             output += ('- ' + i + '\n')
-    return output
+            array.append(i)
+
+    return output, array
 
 
 def get_data_for_list_countries():
@@ -71,51 +74,63 @@ def get_data_for_list_countries():
 
 
 def cant_travel_country_europe():
-    return get_list_countries(config.questions_borders[0], config.questions_borders[1])
+    output, array = get_list_countries(config.questions_borders[0], config.questions_borders[1])
+    return output
 
 
 def can_travel_country_europe():
-    return get_list_countries(config.questions_borders[1], config.questions_borders[2])
+    output, array = get_list_countries(config.questions_borders[1], config.questions_borders[2])
+    return output
 
 
 def cant_travel_country_north():
-    return get_list_countries(config.questions_borders[2], config.questions_borders[3])
+    output, array = get_list_countries(config.questions_borders[2], config.questions_borders[3])
+    return output
 
 
 def can_travel_country_north():
-    return get_list_countries(config.questions_borders[3], config.questions_borders[4])
+    output, array = get_list_countries(config.questions_borders[3], config.questions_borders[4])
+    return output
 
 
 def cant_travel_country_south():
-    return get_list_countries(config.questions_borders[4], config.questions_borders[5])
+    output, array = get_list_countries(config.questions_borders[4], config.questions_borders[5])
+    return output
 
 
 def cant_travel_country_asia():
-    return get_list_countries(config.questions_borders[5], config.questions_borders[6])
+    output, array = get_list_countries(config.questions_borders[5], config.questions_borders[6])
+    return output
 
 
 def can_travel_country_asia():
-    return get_list_countries(config.questions_borders[6], config.questions_borders[7])
+    output, array = get_list_countries(config.questions_borders[6], config.questions_borders[7])
+    return output
 
 
 def cant_travel_country_africa():
-    return get_list_countries(config.questions_borders[7], config.questions_borders[8])
+    output, array = get_list_countries(config.questions_borders[7], config.questions_borders[8])
+    return output
 
 
 def can_travel_country_africa():
-    return get_list_countries(config.questions_borders[8], config.questions_borders[9])
+    output, array = get_list_countries(config.questions_borders[8], config.questions_borders[9])
+    return output
 
 
 def cant_travel_country_pacific():
-    return get_list_countries(config.questions_borders[9], config.questions_borders[10])
+    output, array = get_list_countries(config.questions_borders[9], config.questions_borders[10])
+    return output
 
 
 def cant_travel_country_caribbean():
-    return get_list_countries(config.questions_borders[10], config.questions_borders[11])
+    output, array = get_list_countries(config.questions_borders[10], config.questions_borders[11])
+    return output
 
 
 def can_travel_country_caribbean():
-    return get_list_countries(config.questions_borders[11], config.questions_borders[12])
+    output, array = get_list_countries(config.questions_borders[11], config.questions_borders[12])
+    return output
 
 
 def get_tickets(from_city, date):
@@ -159,10 +174,10 @@ def get_message_one_ticket(ticket, chat_id, from_city, airport, country, destina
                + '\nВозвращение: ' + return_date
                + '\nПересадок: ' + transfer)
 
-        depart_day = str(depart_date)[8:9]
-        depart_month = str(depart_date)[6:7]
-        return_day = str(depart_date)[8:9]
-        return_month = str(depart_date)[6:7]
+        depart_day = depart_date[8:10]
+        depart_month = depart_date[5:7]
+        return_day = return_date[8:10]
+        return_month = return_date[5:7]
         website = config.url_aviasales_search \
                   + from_city \
                   + depart_day \
@@ -179,27 +194,46 @@ def get_message_one_ticket(ticket, chat_id, from_city, airport, country, destina
 
 def get_info_tickets(chat_id, from_city, date):
     response = get_tickets(from_city, date)
+    for i in response:
+        print(i)
     if 'Error' in str(response):
         bot.send_message(chat_id, response)
     else:
+        output, config.europe_permission = get_list_countries(config.questions_borders[1], config.questions_borders[2])
+        output, config.asia_permission = get_list_countries(config.questions_borders[6], config.questions_borders[7])
+        output, config.north_permission = get_list_countries(config.questions_borders[3], config.questions_borders[4])
+        counter_eurasia = 0
+        counter_north = 0
         for ticket in response:
             ticket = json.loads(ticket)
             destination_iata = ticket['destination']
             airport, country = get_info_iata(destination_iata)
-            if country in config.europe:
-                counter = 0
-                bot.send_message(chat_id, 'В Европе')
+
+            if country in str(config.europe_permission) or country in str(config.asia_permission):
                 get_message_one_ticket(ticket,
                                        chat_id,
                                        from_city,
                                        airport,
                                        country,
                                        destination_iata)
-                counter = counter + 1
-                if counter > 2:
+                counter_eurasia = counter_eurasia + 1
+                if counter_eurasia > 2:
                     break
 
+            if country in config.north_permission:
+                get_message_one_ticket(ticket,
+                                       chat_id,
+                                       from_city,
+                                       airport,
+                                       country,
+                                       destination_iata)
+                counter_north = counter_north + 1
+                if counter_north > 2:
+                    break
 
-
+    if counter_eurasia == 0:
+        bot.send_message(chat_id, 'Билетов по Евразии нет')
+    if counter_north == 0:
+        bot.send_message(chat_id, 'Билетов по Северной Америке нет')
 
     bot.send_message(chat_id, 'Поиск завершен')

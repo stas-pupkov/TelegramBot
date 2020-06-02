@@ -52,33 +52,7 @@ departure_cities = {
     'MOW': 'Москва'
 }
 
-
-europe = [
-    'Austria',
-    'Belgium',
-    'Bulgaria',
-    'Croatia',
-    'Cyprus',
-    'Czech Republic',
-    'Denmark',
-    'Estonia',
-    'Finland',
-    'France',
-    'Germany',
-    'Greece',
-    'Hungary',
-    'Ireland',
-    'Italy',
-    'Latvia',
-    'Lithuania',
-    'Luxembourg',
-    'Malta',
-    'Netherlands',
-    'Poland',
-    'Portugal',
-    'Romania ',
-    'Slovakia',
-    'Slovenia',
-    'Spain',
-    'Sweden'
-]
+europe_permission = []
+asia_permission = []
+north_permission = []
+south_permission = []
