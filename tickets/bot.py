@@ -7,9 +7,10 @@ import telebot
 from bs4 import BeautifulSoup
 
 import config
-
+from operator import itemgetter, attrgetter, methodcaller
 
 from telebot import types
+
 
 bot = telebot.TeleBot(config.token)
 
@@ -18,39 +19,71 @@ keyboard1.row('Привет', 'ABA', 'OVB')
 keyboard1.row('/start')
 
 
-def get_fun(from_city):
-    response = get_countries(from_city)
-    if 'Unknown city iata' in str(response):
-        return 'Error'
+def get_info_ticket(chat_id, from_city, month):
+    response = get_tickets(from_city, month)
+    url = 'https://www.aviasales.ru/search/OVB2006PRG27061'
+    if 'Error' in str(response):
+        bot.send_message(chat_id, response)
     else:
-        output = ''
-        for i in response:
-            price = i['value']
+        counter = 0
+        for ticket in response:
+            ticket = json.loads(ticket)
+            destination_iata = ticket['destination']
+            airport, country = get_info_iata(destination_iata)
+            if country in config.europe:
+                price = ticket['value']
+                if len(str(price)) < 8:
+                    depart_date = str(ticket['depart_date'])
+                    return_date = str(ticket['return_date'])
+                    transfer = str(ticket['number_of_changes'])
+                    msg = ('- ' + airport + ', ' + country
+                           + '\nPrice: ' + str(price) + ' rub'
+                           + '\nDepart: ' + depart_date
+                           + '\nReturn: ' + return_date
+                           + '\nTransfer: ' + transfer)
 
-            if price < 40000:
-                destination_iata = i['destination']
-                airport, country = get_info_iata(destination_iata)
-                if country in config.europe:
-                    output += ('- ' + airport + ', ' + country + '\nPrice: ' + str(price) + ' rub\n\n')
-    return output
+                    depart_day = str(depart_date)[8:9]
+                    depart_month = str(depart_date)[6:7]
+                    return_day = str(depart_date)[8:9]
+                    return_month = str(depart_date)[6:7]
+                    website = url \
+                              + from_city \
+                              + depart_day \
+                              + depart_month \
+                              + destination_iata \
+                              + return_day \
+                              + return_month \
+                              + '1'
+                    keyboard = types.InlineKeyboardMarkup()
+                    url_button = types.InlineKeyboardButton(text='Посмотреть на Aviasales', url=website)
+                    keyboard.add(url_button)
+                    bot.send_message(chat_id, msg, reply_markup=keyboard)
+                    counter = counter + 1
+                    if counter > 3:
+                        break
 
 
-def get_countries(from_city):
+
+def get_tickets(from_city, month):
+    if len(str(from_city)) != 3 and str(from_city).isupper() is not True:
+        return 'Error: неверный город отправления'
+    if str(month).replace('-', '').isdigit() is not True:
+        return 'Error: неверный месяц отправления'
+
     url = 'http://map.aviasales.ru/prices.json'
     querystring = {'origin_iata': from_city,
-                   'period': '2020-06-01:month',
-                   'direct': True,
-                   'one_way': True,
-                   'no_visa': True,
-                   'schengen': True,
-                   'need_visa ': True,
-                   'locale': 'ru',
-                   'min_trip_duration_in_days ': 1,
-                   'max_trip_duration_in_days ': 2}
+                   'period': month + ':month',
+                   'locale': 'ru'}
     response = requests.get(url, params=querystring).json()
+
+    output = []
     for i in response:
-        print(i)
-    return response
+        output.append(str(i)
+                      .replace('\'', '\"')
+                      .replace('True', 'true')
+                      .replace('False', 'false'))
+    output = sorted(output)
+    return output
 
 
 def get_info_iata(iata):
@@ -75,10 +108,13 @@ def start_message(message):
 @bot.message_handler(content_types=["text"])
 def default_test(message):
     bot.send_message(message.chat.id, "Wait a second...")
-    msg = get_fun(message.text)
-    if len(msg) > 0:
-        bot.send_message(message.chat.id, msg)
-    else:
-        bot.send_message(message.chat.id, "Empty")
+    #msg = get_info_ticket(message.text)
+    #if message.text == '1':
+    get_info_ticket(message.chat.id, message.text, '2020-06-01')
+        #bot.send_message(message.chat.id, msg)
+    # else:
+    #     bot.send_message(message.chat.id, "Empty")
+    bot.send_message(message.chat.id, "Поиск закончен")
+
 
 bot.polling(none_stop=True)
