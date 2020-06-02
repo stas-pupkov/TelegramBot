@@ -6,7 +6,7 @@ import os
 from flask import Flask, request
 import logging
 
-import config
+from telegram_bot import config
 
 from telebot import types
 

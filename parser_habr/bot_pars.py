@@ -1,6 +1,6 @@
 import telebot
 
-import config
+from telegram_bot import config
 from parser_habr.Task import Task
 import parser
 from parser_habr import markups as m

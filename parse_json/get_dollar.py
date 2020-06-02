@@ -1,13 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import urllib
 
 import requests
 import telebot
 from bs4 import BeautifulSoup
 
-import config
-
+from configs import config
 
 from telebot import types
 

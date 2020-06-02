@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import telebot
-import config
+from telegram_bot import config
 import os
 
 

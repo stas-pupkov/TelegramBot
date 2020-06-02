@@ -4,8 +4,7 @@
 import requests
 import telebot
 
-import config
-
+from configs import config
 
 from telebot import types
 

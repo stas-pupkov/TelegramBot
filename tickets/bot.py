@@ -6,8 +6,7 @@ import requests
 import telebot
 from bs4 import BeautifulSoup
 
-import config
-from operator import itemgetter, attrgetter, methodcaller
+from configs import config
 
 from telebot import types
 
@@ -15,13 +14,13 @@ from telebot import types
 bot = telebot.TeleBot(config.token)
 
 keyboard1 = types.ReplyKeyboardMarkup(True)
-keyboard1.row('Привет', 'ABA', 'OVB')
+keyboard1.row('Привет', 'ABAs', 'OVB')
 keyboard1.row('/start')
 
 
 def get_info_ticket(chat_id, from_city, month):
     response = get_tickets(from_city, month)
-    url = 'https://www.aviasales.ru/search/OVB2006PRG27061'
+    url = 'https://www.aviasales.ru/search/'
     if 'Error' in str(response):
         bot.send_message(chat_id, response)
     else:
@@ -65,7 +64,7 @@ def get_info_ticket(chat_id, from_city, month):
 
 
 def get_tickets(from_city, month):
-    if len(str(from_city)) != 3 and str(from_city).isupper() is not True:
+    if len(str(from_city)) != 3:
         return 'Error: неверный город отправления'
     if str(month).replace('-', '').isdigit() is not True:
         return 'Error: неверный месяц отправления'
@@ -83,7 +82,10 @@ def get_tickets(from_city, month):
                       .replace('True', 'true')
                       .replace('False', 'false'))
     output = sorted(output)
-    return output
+    if len(output) != 0:
+        return output
+    else:
+        return 'Error: неверный данные отправления'
 
 
 def get_info_iata(iata):

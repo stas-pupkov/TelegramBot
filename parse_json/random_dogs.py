@@ -1,11 +1,10 @@
-import json
 import re
 
 import requests
 import telebot
 from telebot import types
 
-import config
+from configs import config
 
 bot = telebot.TeleBot(config.token)
 
