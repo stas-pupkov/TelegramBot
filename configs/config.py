@@ -5,7 +5,40 @@ url_dollar_google = 'https://www.google.com/search?sxsrf=ALeKk03RR756WLVS2xpoVDp
 url_dollar_cb = 'https://www.cbr-xml-daily.ru/daily_json.js'
 headers_dollar_google = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36'}
 
+url_border_countries = 'https://www.wanderlust.co.uk/content/coronavirus-travel-updates/'
+long_body = 9000
 
+questions_borders = [
+        'Which European countries have travel restrictions?',
+        'Which European countries you can still travel to?',
+        'Which North American places have travel restrictions?',
+        'Which North American countries have their borders open?',
+        'Which Central and South America Countries have travel restrictions?',
+        'Which Asian countries have travel restrictions?',
+        'Which Asian countries have their borders open?',
+        'Which African countries have travel restrictions?',
+        'Which African countries still have their borders open?',
+        'Which South Pacific countries can you not travel to?',
+        'Which Caribbean countries have travel restrictions?',
+        'Which Caribbean countries still have their borders open?',
+        'Can\'t wait to travel again?'
+    ]
+
+parts_world = [
+    '✅✈️ Европа',
+    '✅✈️ Северная Америка',
+    '✅✈️ Азия',
+    '✅✈️ Африка',
+    '✅✈️ Карибы',
+
+    '❌✈️️ Европа',
+    '❌✈️️ Северная Америка',
+    '❌✈️️ Южная Америка',
+    '❌✈️️ Азия',
+    '❌✈️️ Африка',
+    '❌✈️️ Океания',
+    '❌✈️️ Карибы'
+]
 
 europe = [
     'Austria',

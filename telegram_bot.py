@@ -25,8 +25,50 @@ def getting_information(message):
                          + '\n\nКурс от Google: ' + value_google
                          + '\nОпубликован: ' + published_google)
 
+    if message.text == 'Границы':
+        bot.send_message(message.chat.id, 'Где?', reply_markup=keyboards.part_world_keyboard)
 
 
+
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    chat_id = call.message.chat.id
+    if config.parts_world.index(str(call.data)) < 5:
+        permission = 'Страны с открытыми границами в '
+    else:
+        permission = 'Страны с закрытыми границами в '
+    if call.message:
+        msg = permission + '"' + str(call.data)[4:] \
+                         + '"' \
+                         + ' на ' \
+                         + functions.get_data_for_list_countries()
+        bot.send_message(chat_id, msg)
+        if call.data == config.parts_world[0]:
+            bot.send_message(chat_id, functions.can_travel_country_europe())
+        elif call.data == config.parts_world[1]:
+            bot.send_message(chat_id, functions.can_travel_country_north())
+        elif call.data == config.parts_world[2]:
+            bot.send_message(chat_id, functions.can_travel_country_asia())
+        elif call.data == config.parts_world[3]:
+            bot.send_message(chat_id, functions.can_travel_country_africa())
+        elif call.data == config.parts_world[4]:
+            bot.send_message(chat_id, functions.can_travel_country_caribbean())
+        elif call.data == config.parts_world[5]:
+            bot.send_message(chat_id, functions.cant_travel_country_europe())
+        elif call.data == config.parts_world[6]:
+            bot.send_message(chat_id, functions.cant_travel_country_north())
+        elif call.data == config.parts_world[7]:
+            bot.send_message(chat_id, functions.cant_travel_country_south())
+        elif call.data == config.parts_world[8]:
+            bot.send_message(chat_id, functions.cant_travel_country_asia())
+        elif call.data == config.parts_world[9]:
+            bot.send_message(chat_id, functions.cant_travel_country_africa())
+        elif call.data == config.parts_world[10]:
+            bot.send_message(chat_id, functions.cant_travel_country_pacific())
+        elif call.data == config.parts_world[11]:
+            bot.send_message(chat_id, functions.cant_travel_country_caribbean())
 
 
 bot.polling(none_stop=True)

@@ -1,9 +1,9 @@
 import telebot
 
-from telegram_bot import config
+from configs import config
+
+from parser_habr import markups as m, parser
 from parser_habr.Task import Task
-import parser
-from parser_habr import markups as m
 
 bot = telebot.TeleBot(config.token)
 task = Task()

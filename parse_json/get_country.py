@@ -71,9 +71,7 @@ def send_text(message):
         mess_sender = cant_travel_country_europe()
         bot.send_message(message.chat.id, mess_sender)
     if message.text.lower() == 'привет':
-        keyboard2 = types.InlineKeyboardMarkup(row_width=1)
 
-        keyboard2.add(url_button)
         bot.send_message(message.chat.id, 'Country', reply_markup=keyboard)
 
 
