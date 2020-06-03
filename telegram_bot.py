@@ -1,18 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import datetime
+import time
 
 import telebot
-
+from subprocess import check_output
 from configs import keyboards, config, functions
 
 bot = telebot.TeleBot(config.token)
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start', 'stop'])
 def start_message(message):
-    msg = f"<b>Hello {message.from_user.first_name}!</b>\nПривет"
-    bot.send_message(message.chat.id, msg, parse_mode='html', reply_markup=keyboards.main_keyboard)
+    if message.text == '/start':
+        msg = 'Привет, ' + message.from_user.first_name + '!'
+        bot.send_message(message.chat.id, msg, reply_markup=keyboards.main_keyboard)
+    if message.text == '/stop':
+        comand = 'heroku ps:scale bot=0'
+        bot.send_message(message.chat.id, check_output(comand, shell=True))
 
 
 @bot.message_handler(content_types=['text'])
@@ -26,7 +31,6 @@ def getting_information(message):
               + '\n\nКурс от ProFinance:'\
               + '\n' + f"<b>{value_website}</b>" + ' рублей'
         bot.send_message(message.chat.id, msg, parse_mode='html')
-
     if message.text == 'Границы':
         bot.send_message(message.chat.id, 'Выбери категорию', reply_markup=keyboards.part_world_keyboard)
     if message.text == 'Билеты':
@@ -104,4 +108,10 @@ def callback_inline(call):
 
 
 
-bot.polling(none_stop=True)
+#bot.polling(none_stop=True)
+
+while True:
+    try:
+        bot.polling(none_stop=True)
+    except Exception as e:
+        time.sleep(5)
