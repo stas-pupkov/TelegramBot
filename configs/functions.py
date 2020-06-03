@@ -18,16 +18,12 @@ def get_dollar_cb():
     return value, date_pub
 
 
-
-def get_dollar_google():
-    full_page = requests.get(config.url_dollar_google, headers=config.headers_dollar_google)
+def get_dollar_website():
+    full_page = requests.get(config.url_dollar_website, headers=config.headers_dollar_website)
     soup = BeautifulSoup(full_page.content, 'html.parser')
-    price = soup.findAll('span', {'class': 'DFlfde SwHCTb'})
-    price = price[0].text
-    for el in soup.select('#knowledge-currency__updatable-data-column'):
-        data_pub = el.select('.hqAUc ')[0].text
-        data_pub = str(data_pub).replace(' · Отказ от обязательств', '')
-    return price, data_pub
+    table = soup.findAll('table', {'class': 'stat news'})
+    price = table[0].findAll('td')[4].text
+    return price
 
 
 def get_list_countries(question1, question2):

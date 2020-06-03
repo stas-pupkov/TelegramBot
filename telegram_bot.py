@@ -19,12 +19,13 @@ def start_message(message):
 def getting_information(message):
     if message.text == 'Доллар':
         value_cb, published_cb = functions.get_dollar_cb()
-        value_google, published_google = functions.get_dollar_google()
-        bot.send_message(message.chat.id,
-                         'Курс от ЦБ: ' + value_cb
-                         + '\nОпубликован: ' + published_cb
-                         + '\n\nКурс от Google: ' + value_google
-                         + '\nОпубликован: ' + published_google)
+        value_website = functions.get_dollar_website()
+        msg = 'Курс от ЦБ: ' \
+              + '\n' + f"<b>{value_cb}</b>" + ' рублей' \
+              + '\nОпубликован: ' + published_cb \
+              + '\n\nКурс от ProFinance:'\
+              + '\n' + f"<b>{value_website}</b>" + ' рублей'
+        bot.send_message(message.chat.id, msg, parse_mode='html')
 
     if message.text == 'Границы':
         bot.send_message(message.chat.id, 'Выбери категорию', reply_markup=keyboards.part_world_keyboard)
