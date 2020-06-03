@@ -13,6 +13,8 @@ bot = telebot.TeleBot(config.token)
 @bot.message_handler(commands=['start', 'stop'])
 def start_message(message):
     if message.text == '/start':
+        comand = 'heroku ps:scale bot=1'
+        bot.send_message(message.chat.id, check_output(comand, shell=True))
         msg = 'Привет, ' + message.from_user.first_name + '!'
         bot.send_message(message.chat.id, msg, reply_markup=keyboards.main_keyboard)
     if message.text == '/stop':
