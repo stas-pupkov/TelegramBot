@@ -207,8 +207,8 @@ def get_info_tickets(chat_id, from_city, date):
     for ticket in response:
         ticket = json.loads(ticket)
         price = ticket['value']
-        if price > 40000:
-            bot.send_message(chat_id, 'Билеты дешевле 40к закончились')
+        if price > 50000:
+            bot.send_message(chat_id, 'Билеты дешевле 50к закончились')
             break
         else:
             destination_iata = ticket['destination']
