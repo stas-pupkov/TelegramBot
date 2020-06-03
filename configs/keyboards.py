@@ -2,7 +2,7 @@ from telebot import types
 
 from configs import config
 
-main_keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+main_keyboard = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
 main_keyboard_btn1 = types.KeyboardButton('Доллар')
 main_keyboard_btn2 = types.KeyboardButton('Границы')
 main_keyboard_btn3 = types.KeyboardButton('Билеты')
