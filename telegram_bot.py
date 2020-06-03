@@ -58,7 +58,7 @@ def ask_tickets(message):
             else:
                 config.departure_date = str(now)[:8].replace(str(now)[5:7], '0' + str(now.month + 1))
 
-    bot.send_message(message.chat.id, 'Поиск авиабилетов...'
+    bot.send_message(message.chat.id, 'Поиск авиабилетов... Это может занять некоторое время ⏳'
                      + '\n\nПоиск завершится, когда появится сообщение '
                      + '"Поиск завершен"', reply_markup=keyboards.main_keyboard)
     functions.get_info_tickets(message.chat.id, config.departure_city, config.departure_date)

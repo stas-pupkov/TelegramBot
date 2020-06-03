@@ -1,4 +1,4 @@
-token = '875689477:AAH49j48TBWQkEb2Ah0gfKA56hN7A0Sk4VM'
+token = '875689477:AAG0pBegyGCOhp7HrRfmGYHfwgjoLcj4gjE'
 app_name = 'MiniVanBot'
 
 url_dollar_website = 'http://www.profinance.ru/chart/usdrub/?s=USDRUB'

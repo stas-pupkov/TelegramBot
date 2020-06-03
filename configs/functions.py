@@ -129,7 +129,7 @@ def can_travel_country_caribbean():
     return output
 
 
-def get_tickets(from_city, date):
+def get_all_tickets(from_city, date):
     querystring = {'origin_iata': from_city,
                    'period': date + '01:month',
                    'locale': 'ru'}
@@ -141,7 +141,6 @@ def get_tickets(from_city, date):
                       .replace('\'', '\"')
                       .replace('True', 'true')
                       .replace('False', 'false'))
-    output = sorted(output)
     if len(output) != 0:
         return output
     else:
@@ -158,7 +157,6 @@ def get_info_iata(iata):
                     'action': 'SEARCH',
                     'offset': 0}
     response = requests.post(url, data=headers_iata).json()
-    print(response)
     try:
         airport = str(response['airports'][0]['name'])
         country = str(response['airports'][0]['country'])
@@ -196,18 +194,22 @@ def get_message_one_ticket(ticket, chat_id, from_city, date, airport, country, d
 
 
 def get_info_tickets(chat_id, from_city, date):
-    response = get_tickets(from_city, date)
-    if 'Error' in str(response):
-        bot.send_message(chat_id, response)
-    else:
-        output, config.europe_permission = get_list_countries(config.questions_borders[1], config.questions_borders[2])
-        output, config.asia_permission = get_list_countries(config.questions_borders[6], config.questions_borders[7])
-        output, config.north_permission = get_list_countries(config.questions_borders[3], config.questions_borders[4])
-        counter_europe = 0
-        counter_asia = 0
-        counter_north = 0
-        for ticket in response:
-            ticket = json.loads(ticket)
+    response = get_all_tickets(from_city, date)
+    response = sorted(response, key=lambda k: json.loads(k)['value'])
+    output, config.europe_permission = get_list_countries(config.questions_borders[1], config.questions_borders[2])
+    output, config.asia_permission = get_list_countries(config.questions_borders[6], config.questions_borders[7])
+    output, config.north_permission = get_list_countries(config.questions_borders[3], config.questions_borders[4])
+    counter_europe = 0
+    counter_asia = 0
+    counter_north = 0
+
+    for ticket in response:
+        ticket = json.loads(ticket)
+        price = ticket['value']
+        if price > 40000:
+            bot.send_message(chat_id, 'Билеты дешевле 40к закончились')
+            break
+        else:
             destination_iata = ticket['destination']
             airport, country = get_info_iata(destination_iata)
             if country == 'Russia':
