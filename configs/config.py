@@ -1,5 +1,4 @@
-token = '875689477:AAG0pBegyGCOhp7HrRfmGYHfwgjoLcj4gjE'
-app_name = 'MiniVanBot'
+token = ''
 
 url_dollar_website = 'http://www.profinance.ru/chart/usdrub/?s=USDRUB'
 url_dollar_cb = 'https://www.cbr-xml-daily.ru/daily_json.js'
