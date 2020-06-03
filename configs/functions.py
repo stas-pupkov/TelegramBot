@@ -173,6 +173,7 @@ def get_info_iata(iata):
 def get_message_one_ticket(ticket, chat_id, from_city, date, airport, country, destination_iata):
     price = str(ticket['value'])
     transfer = str(ticket['number_of_changes'])
+
     msg = ('- ' + airport + ', ' + destination_iata + ', ' + country
            + '\nЦена билета: ' + price + ' рублей'
            + '\nПересадок: ' + transfer)
